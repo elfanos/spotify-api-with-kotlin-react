@@ -4,7 +4,9 @@ buildscript {
 		springBootVersion = '2.0.2.RELEASE'
 	}
 	repositories {
-		mavenCentral()
+        maven {
+            url("https://plugins.gradle.org/m2/")
+        }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -36,25 +38,20 @@ compileTestKotlin {
 }
 
 repositories {
-	mavenCentral()
+    maven {
+        url("https://plugins.gradle.org/m2/")
+    }
 }
-
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
+    compile 'se.michaelthelin.spotify:spotify-web-api-java:2.0.2'
 
-	//Server and mongodb
+	//Server
 	compile('org.springframework.boot:spring-boot-starter-tomcat')
 	compile("org.springframework.boot:spring-boot-starter-data-rest")
-	compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
-	//Test
-	testCompile('org.jetbrains.kotlin:kotlin-test')
-	testCompile('org.jetbrains.kotlin:kotlin-test-junit')
-	testCompile('com.github.fakemongo:fongo:2.2.0-RC1')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
