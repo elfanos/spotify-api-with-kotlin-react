@@ -5,6 +5,7 @@ import React from 'react';
 import queryString from 'query-string';
 import { spotifyTokens, getCurrentUserData } from '../services/spotify.service';
 import { initialize } from '../../states/actions/user.action';
+import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 const REGEX_STRING_ARRAY = /["\]']+/gi;
 
@@ -17,28 +18,34 @@ const retrieveStringFromArray = ( stringArray ) => {
     };
 };
 
-const intializeUserData = async ( parsed ) => {
+const initializeUserData = async ( parsed ) => {
     let userData = {};
     userData.token = retrieveStringFromArray(
         await spotifyTokens( parsed.code ).then( response => Promise.resolve( response ) )
     );
-    console.log(userData.token);
     let newUser = await getCurrentUserData( userData.token.accessToken ).
-    then( response => console.log(response) ).catch(error => error);
-    console.log(newUser);
+    then( response => {return JSON.parse(response)}
+    ).catch(error => error);
+    userData.email = newUser.email;
+    userData.name = newUser.displayName;
+    return userData
 };
 class SpotifyAuthController extends React.Component {
 
     componentDidMount(){
-        console.log(this.props.location.search);
-        intializeUserData( queryString.parse( this.props.location.search ))
+        initializeUserData( queryString.parse( this.props.location.search ))
+            .then( user =>
+                this.props.dispatch( initialize( user.name, user.email, user.token ) ) )
+            .catch( error => console.log(error) );
     }
     render() {
-        return (
-            <h1>TODO fix this auth</h1>
-        );
+        if( queryString.parse( this.props.location.search ) !== undefined ) {
+            return( <Redirect to='/home' /> )
+        }else {
+            return( <Redirect to='/login' /> )
+        }
     }
 
 }
 
-export default SpotifyAuthController;
+export default connect(null,null)(SpotifyAuthController);
